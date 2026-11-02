@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+data/output/
+.vscode/
+.idea/
+*.swp
+.DS_Store
+en.subject.pdf
+data.zip
+llm_sdk.zip
