@@ -2,14 +2,16 @@
 import sys
 
 from src.arguments import parser_args
+from src.json_io import load_functions, load_prompt
 
 
 def main() -> int:
     try:
         args = parser_args()
-        print(f"functions_definition: {args.functions_definition}")
-        print(f"input: {args.input}")
-        print(f"output: {args.output}")
+        functions = load_functions(args.functions_definition)
+        prompts = load_prompt(args.input)
+        print(f"{len(functions)} functions loaded")
+        print(f"{len(prompts)} prompts loaded")
     except (ValueError, RuntimeError) as error:
         print(f"Error: {error}", file=sys.stderr)
         return 1
