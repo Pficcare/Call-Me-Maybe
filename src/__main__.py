@@ -1,17 +1,21 @@
 
+
 import sys
 
 from src.arguments import parser_args
 from src.json_io import load_functions, load_prompt
+from src.llm import load_model
 
 
 def main() -> int:
     try:
         args = parser_args()
         functions = load_functions(args.functions_definition)
-        prompts = load_prompt(args.input)
         print(f"{len(functions)} functions loaded")
+        prompts = load_prompt(args.input)
         print(f"{len(prompts)} prompts loaded")
+        model = load_model(args.model)
+        print(f"Model {args.model} loaded")
     except (ValueError, RuntimeError) as error:
         print(f"Error: {error}", file=sys.stderr)
         return 1
