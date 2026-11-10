@@ -1,6 +1,7 @@
 PYTHON      := uv run python
 FLAKE8      := uv run flake8
 MYPY        := uv run mypy
+TEST        := uv run pytest
 MAIN        := src
 EXCLUDE     := .venv,llm_sdk
 
@@ -9,7 +10,7 @@ MYPY_FLAGS  := --warn-return-any --warn-unused-ignores --ignore-missing-imports 
 
 ARGS        ?=
 
-.PHONY: all install run debug clean lint lint-strict
+.PHONY: all install run debug test clean lint lint-strict
 
 all: install
 
@@ -21,6 +22,9 @@ run:
 
 debug:
 	$(PYTHON) -m pdb -m $(MAIN) $(ARGS)
+
+test:
+	$(TEST)
 
 clean:
 	find . -type d -name "__pycache__" -not -path "./.venv/*" -exec rm -rf {} +
