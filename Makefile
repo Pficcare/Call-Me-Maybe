@@ -6,7 +6,7 @@ MAIN        := src
 EXCLUDE     := .venv,llm_sdk
 
 MYPY_FLAGS  := --warn-return-any --warn-unused-ignores --ignore-missing-imports \
-               --disallow-untyped-defs --check-untyped-defs
+               --disallow-untyped-defs --check-untyped-defs --no-namespace-packages
 
 ARGS        ?=
 
