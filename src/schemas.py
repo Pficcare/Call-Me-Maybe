@@ -1,7 +1,7 @@
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 ArgumentValue = float | int | str | bool
 
@@ -21,7 +21,7 @@ class ReturnSpec(BaseModel):
 class FunctionDefinition(BaseModel):
     """One callable function, as described in functions_definition.json."""
 
-    name: str
+    name: str = Field(pattern=r"^[A-Za-z_][A-Za-z0-9_]*$")
     description: str
     parameters: dict[str, ParameterSpec]
     returns: ReturnSpec
