@@ -18,7 +18,7 @@ def main() -> int:
         print(f"Model {args.model} loaded")
         vocab = load_vocabulary(model.get_path_to_vocab_file())
         print(f"{len(vocab)} tokens in vocabulary table")
-        explore_prompts(model, vocab, prompts)
+        explore_prompts(model, vocab, prompts, functions)
     except (ValueError, RuntimeError) as error:
         print(f"Error: {error}", file=sys.stderr)
         return 1
