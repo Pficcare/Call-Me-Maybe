@@ -49,6 +49,19 @@ def load_prompt(path: Path) -> list[PromptRequest]:
         raise ValueError(f"Invalid format in '{path}': {error}") from error
 
 
+def check_output(path: Path) -> None:
+
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        existed = path.exists()
+        with open(path, "a", encoding="utf-8"):
+            pass
+        if not existed:
+            path.unlink()
+    except OSError as error:
+        raise ValueError(f"Cannot write '{path}': {error}") from error
+
+
 def results(path: Path, calls: list[FunctionCall]) -> None:
     
     data = [call.model_dump() for call in calls]
