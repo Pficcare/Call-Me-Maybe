@@ -12,11 +12,17 @@ def load_model(model_name: str) -> "Small_LLM_Model": # Reference differer Mpy/P
     
     try:
         model = Small_LLM_Model(model_name)
-    except Exception as e:
-        raise e
+    except OSError as error:
+        raise ValueError(f"Cannot load model '{model_name}': {error}") from error
     return model
 
 
+def get_vocab_path(model: "Small_LLM_Model") -> str:
+    try:
+        path: str = model.get_path_to_vocab_file()
+    except OSError as error:
+        raise ValueError(f"Cannot find the vocabulary file: {error}") from error
+    return path
 
 
 def encode_text(model: "Small_LLM_Model", text: str) -> list[int]:
