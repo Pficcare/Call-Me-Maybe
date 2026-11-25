@@ -1,9 +1,11 @@
+import json
+import sys
 from typing import TYPE_CHECKING
 
 from src.llm import encode_text
 from src.schemas import PromptRequest, FunctionDefinition
-from src.prompts import build_selection_prompt
-from src.decoder import generate_choice
+from src.prompts import build_arguments_prompt, build_selection_prompt
+from src.decoder import generate_choice, generate_value
 
 if TYPE_CHECKING:
     from llm_sdk import Small_LLM_Model
@@ -14,6 +16,11 @@ def explore_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list
         print(f"\nPrompt: {prompt.prompt!r}") #!r ca donne ""
         function = select_function(prompt, functions, model, vocab)
         print(f"  -> {function.name}")
+        try:
+            arguments = extract_arguments(prompt, function, model, vocab)
+            print(f"  -> {arguments}")
+        except (ValueError, RuntimeError) as error:
+            print(f"  -> Error: {error}", file=sys.stderr)
 
 
 def select_function(request: PromptRequest, functions: list[FunctionDefinition],model: "Small_LLM_Model", vocab: dict[int,str]) -> FunctionDefinition:
@@ -34,4 +41,26 @@ def select_function(request: PromptRequest, functions: list[FunctionDefinition],
     
     raise RuntimeError
 
-    
+
+def extract_arguments(request: PromptRequest, function: FunctionDefinition, model: "Small_LLM_Model", vocab: dict[int, str]) -> str:
+
+    if not function.parameters:
+        return "{}"
+
+    prompt = build_arguments_prompt(request, function)
+    arguments = ""
+    remaining = len(function.parameters)
+
+    for name, spec in function.parameters.items():
+        remaining -= 1
+        if remaining == 0:
+            terminator = "}"
+        else:
+            terminator = ","
+
+        arguments += json.dumps(name) + ":"
+        ids = encode_text(model, prompt + arguments)
+        value = generate_value(model, vocab, ids, spec.type, terminator)
+        arguments += value + terminator
+
+    return "{" + arguments
