@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 
 from src.llm import get_next_logits
-from src.rules import is_choice_prefix
+from src.rules import is_choice_prefix, is_value_complete, is_value_prefix
 
 if TYPE_CHECKING:
     from llm_sdk import Small_LLM_Model
@@ -51,3 +51,17 @@ def generate_choice(
         ids.append(token_id)
         current += vocab[token_id]
     return current[:-1]
+
+
+def find_value_tokens(
+    current: str, vocab: dict[int, str], param_type: str, terminator: str
+) -> list[int]:
+    allowed: list[int] = []
+    can_stop = is_value_complete(current, param_type)
+    for token_id, text in vocab.items():
+        if text == terminator:
+            if can_stop:
+                allowed.append(token_id)
+        elif text and is_value_prefix(current + text, param_type):
+            allowed.append(token_id)
+    return allowed
