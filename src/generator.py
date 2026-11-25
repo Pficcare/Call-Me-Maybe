@@ -28,6 +28,10 @@ def explore_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list
         except (ValueError, RuntimeError) as error:
             print(f"  -> Error: {error}", file=sys.stderr)
 
+    failed = len(prompts) - len(calls)
+    if failed > 0:
+        print(f"{failed} of {len(prompts)} prompts failed", file=sys.stderr)
+
     return calls
 
 
