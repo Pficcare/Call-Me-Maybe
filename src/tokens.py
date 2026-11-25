@@ -26,6 +26,8 @@ def decode_token(token: str, byte_decoder: dict[str, int]) -> str | None:
     l_octet: list[int] = []
 
     for c in token:
+        if c not in byte_decoder:
+            raise ValueError(f"Unsupported character in the vocabulary: {c!r}")
         x = byte_decoder[c]
         l_octet.append(x)
     try:
@@ -45,8 +47,8 @@ def load_vocabulary(path: str) -> dict[int, str]:
     adapter = TypeAdapter(dict[str,int])
     try:
         datas: dict[str,int]= adapter.validate_python(jason)
-    except ValidationError as e:
-        raise ValueError
+    except ValidationError as error:
+        raise ValueError(f"Invalid vocabulary format in '{path}'") from error
 
     decoder: dict[str, int] = byte_decoder()
 
