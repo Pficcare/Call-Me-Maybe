@@ -24,3 +24,15 @@ def build_selection_prompt(request: PromptRequest,functions: list[FunctionDefini
         f"Request: {request.prompt}\n"
         'Function call: {"name": "'
     )
+
+
+def build_arguments_prompt(request: PromptRequest, function: FunctionDefinition) -> str:
+
+    signature = format_function([function])
+
+    return (
+        "Function:\n"
+        f"{signature}\n\n"
+        f"Request: {request.prompt}\n"
+        "Arguments: {"
+    )
