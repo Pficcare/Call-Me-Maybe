@@ -58,9 +58,13 @@ def extract_arguments(request: PromptRequest, function: FunctionDefinition, mode
         else:
             terminator = ","
 
-        arguments += json.dumps(name) + ":"
+        quote = ""
+        if spec.type == "string":
+            quote = '"'
+
+        arguments += json.dumps(name) + ":" + quote
         ids = encode_text(model, prompt + arguments)
         value = generate_value(model, vocab, ids, spec.type)
-        arguments += value + terminator
+        arguments += value + quote + terminator
 
     return "{" + arguments
