@@ -9,7 +9,9 @@ from src.schemas import FunctionCall, FunctionDefinition, PromptRequest
 def read_json(path: Path) -> object:  # Plus strict que Any : à valider
     try:
         with open(path, encoding="utf-8") as file:
-            return json.load(file)
+            data: object = json.load(file)
+        json.dumps(data, ensure_ascii=False).encode("utf-8")
+        return data
     except OSError as error:
         raise ValueError(f"Cannot read '{path}': {error}") from error
     except (ValueError, RecursionError) as error:
