@@ -28,3 +28,9 @@ def is_value_complete(text: str, param_type: str) -> bool:
     if param_type == "number":
         return is_number_complete(text)
     raise ValueError(f"Unsupported parameter type: {param_type}")
+
+
+def is_value_end(text: str, param_type: str) -> bool:
+    if param_type == "number":
+        return text.startswith(",") or text.startswith("}")
+    raise ValueError(f"Unsupported parameter type: {param_type}")
