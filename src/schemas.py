@@ -1,6 +1,3 @@
-
-from typing import Literal
-
 from pydantic import BaseModel, ConfigDict, Field
 
 ArgumentValue = float | int | str | bool
@@ -9,7 +6,7 @@ ArgumentValue = float | int | str | bool
 class ParameterSpec(BaseModel):
     """Type of one function parameter."""
 
-    type: Literal["number", "integer", "string", "boolean"]
+    type: str
 
 
 class ReturnSpec(BaseModel):
