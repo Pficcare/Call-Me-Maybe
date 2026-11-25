@@ -34,6 +34,14 @@ def find_choice_tokens(
     return allowed
 
 
+def find_matching_choices(current: str, choices: list[str]) -> list[str]:
+    matching: list[str] = []
+    for choice in choices:
+        if choice.startswith(current):
+            matching.append(choice)
+    return matching
+
+
 def generate_choice(
     model: "Small_LLM_Model",
     vocab: dict[int, str],
@@ -44,13 +52,15 @@ def generate_choice(
     for choice in choices:
         targets.append(choice + '"')
     current = ""
-    while not current.endswith('"'):
+    remaining = targets
+    while len(remaining) > 1:
         logits = get_next_logits(model, ids)
-        allowed = find_choice_tokens(current, vocab, targets)
+        allowed = find_choice_tokens(current, vocab, remaining)
         token_id = select_token(apply_mask(logits, allowed))
         ids.append(token_id)
         current += vocab[token_id]
-    return current[:-1]
+        remaining = find_matching_choices(current, remaining)
+    return remaining[0][:-1]
 
 
 def find_value_tokens(
