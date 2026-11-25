@@ -18,19 +18,30 @@ def is_number_prefix(text: str) -> bool:
     return is_number_complete(text) or is_number_complete(text + "0")
 
 
+def is_string_prefix(text: str) -> bool:
+    pattern = r'[^"\\\x00-\x1f]*'
+    return re.fullmatch(pattern, text) is not None
+
+
 def is_value_prefix(text: str, param_type: str) -> bool:
     if param_type == "number":
         return is_number_prefix(text)
+    if param_type == "string":
+        return is_string_prefix(text)
     raise ValueError(f"Unsupported parameter type: {param_type}")
 
 
 def is_value_complete(text: str, param_type: str) -> bool:
     if param_type == "number":
         return is_number_complete(text)
+    if param_type == "string":
+        return is_string_prefix(text)
     raise ValueError(f"Unsupported parameter type: {param_type}")
 
 
 def is_value_end(text: str, param_type: str) -> bool:
     if param_type == "number":
         return text.startswith(",") or text.startswith("}")
+    if param_type == "string":
+        return text.startswith('"')
     raise ValueError(f"Unsupported parameter type: {param_type}")
