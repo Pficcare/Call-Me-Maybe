@@ -2,7 +2,7 @@ import sys
 
 from src.arguments import parser_args
 from src.generator import explore_prompts
-from src.json_io import load_functions, load_prompt
+from src.json_io import load_functions, load_prompt, results
 from src.llm import get_vocab_path, load_model
 from src.tokens import load_vocabulary
 
@@ -18,7 +18,9 @@ def main() -> int:
         print(f"Model {args.model} loaded")
         vocab = load_vocabulary(get_vocab_path(model))
         print(f"{len(vocab)} tokens in vocabulary table")
-        explore_prompts(model, vocab, prompts, functions)
+        calls = explore_prompts(model, vocab, prompts, functions)
+        results(args.output, calls)
+        print(f"\n{len(calls)} function calls written to {args.output}")
     except (ValueError, RuntimeError) as error:
         print(f"Error: {error}", file=sys.stderr)
         return 1
