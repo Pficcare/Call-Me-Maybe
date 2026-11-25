@@ -1,9 +1,10 @@
 import json
+import math
 import sys
 from typing import TYPE_CHECKING
 
 from src.llm import encode_text
-from src.schemas import PromptRequest, FunctionDefinition
+from src.schemas import ArgumentValue, FunctionCall, FunctionDefinition, PromptRequest
 from src.prompts import build_arguments_prompt, build_selection_prompt
 from src.decoder import generate_choice, generate_value
 
@@ -18,7 +19,8 @@ def explore_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list
             function = select_function(prompt, functions, model, vocab)
             print(f"  -> {function.name}")
             arguments = extract_arguments(prompt, function, model, vocab)
-            print(f"  -> {arguments}")
+            call = build_call(prompt, function, arguments)
+            print(f"  -> {call.parameters}")
         except (ValueError, RuntimeError) as error:
             print(f"  -> Error: {error}", file=sys.stderr)
 
@@ -68,3 +70,20 @@ def extract_arguments(request: PromptRequest, function: FunctionDefinition, mode
         arguments += value + quote + terminator
 
     return "{" + arguments
+
+
+def build_call(request: PromptRequest, function: FunctionDefinition, arguments: str) -> FunctionCall:
+
+    parameters: dict[str, ArgumentValue] = json.loads(arguments)
+
+    for name, spec in function.parameters.items():
+        if spec.type == "number":
+            try:
+                number = float(parameters[name])
+            except OverflowError as error:
+                raise ValueError(f"Number too large for '{name}'") from error
+            if not math.isfinite(number):
+                raise ValueError(f"Number too large for '{name}'")
+            parameters[name] = number
+
+    return FunctionCall(prompt=request.prompt, name=function.name, parameters=parameters)
