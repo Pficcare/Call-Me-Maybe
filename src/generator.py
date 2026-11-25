@@ -12,7 +12,10 @@ if TYPE_CHECKING:
     from llm_sdk import Small_LLM_Model
 
 
-def explore_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list[PromptRequest], functions: list[FunctionDefinition]) -> None:
+def explore_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list[PromptRequest], functions: list[FunctionDefinition]) -> list[FunctionCall]:
+
+    calls: list[FunctionCall] = []
+
     for prompt in prompts:
         print(f"\nPrompt: {prompt.prompt!r}") #!r ca donne ""
         try:
@@ -21,8 +24,11 @@ def explore_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list
             arguments = extract_arguments(prompt, function, model, vocab)
             call = build_call(prompt, function, arguments)
             print(f"  -> {call.parameters}")
+            calls.append(call)
         except (ValueError, RuntimeError) as error:
             print(f"  -> Error: {error}", file=sys.stderr)
+
+    return calls
 
 
 def select_function(request: PromptRequest, functions: list[FunctionDefinition],model: "Small_LLM_Model", vocab: dict[int,str]) -> FunctionDefinition:
