@@ -14,9 +14,9 @@ if TYPE_CHECKING:
 def explore_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list[PromptRequest], functions: list[FunctionDefinition]) -> None:
     for prompt in prompts:
         print(f"\nPrompt: {prompt.prompt!r}") #!r ca donne ""
-        function = select_function(prompt, functions, model, vocab)
-        print(f"  -> {function.name}")
         try:
+            function = select_function(prompt, functions, model, vocab)
+            print(f"  -> {function.name}")
             arguments = extract_arguments(prompt, function, model, vocab)
             print(f"  -> {arguments}")
         except (ValueError, RuntimeError) as error:
@@ -39,7 +39,7 @@ def select_function(request: PromptRequest, functions: list[FunctionDefinition],
         if function.name == selcted_name:
             return function
     
-    raise RuntimeError
+    raise RuntimeError(f"Unknown function: {selcted_name}")
 
 
 def extract_arguments(request: PromptRequest, function: FunctionDefinition, model: "Small_LLM_Model", vocab: dict[int, str]) -> str:
