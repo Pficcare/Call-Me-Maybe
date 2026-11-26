@@ -28,8 +28,12 @@ def find_choice_tokens(
     current: str, vocab: dict[int, str], choices: list[str]
 ) -> list[int]:
     allowed: list[int] = []
+    can_stop = current in choices
     for token_id, text in vocab.items():
-        if text and is_choice_prefix(current + text, choices):
+        if is_value_end(text, "string"):
+            if can_stop:
+                allowed.append(token_id)
+        elif text and is_choice_prefix(current + text, choices):
             allowed.append(token_id)
     return allowed
 
@@ -48,19 +52,18 @@ def generate_choice(
     ids: list[int],
     choices: list[str],
 ) -> str:
-    targets: list[str] = []
-    for choice in choices:
-        targets.append(choice + '"')
     current = ""
-    remaining = targets
+    remaining = choices
     while len(remaining) > 1:
         logits = get_next_logits(model, ids)
         allowed = find_choice_tokens(current, vocab, remaining)
         token_id = select_token(apply_mask(logits, allowed))
+        if is_value_end(vocab[token_id], "string"):
+            return current
         ids.append(token_id)
         current += vocab[token_id]
         remaining = find_matching_choices(current, remaining)
-    return remaining[0][:-1]
+    return remaining[0]
 
 
 def find_value_tokens(
