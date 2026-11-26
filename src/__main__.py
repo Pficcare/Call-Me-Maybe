@@ -2,7 +2,7 @@ import sys
 
 from src.arguments import parser_args
 from src.generator import explore_prompts
-from src.json_io import load_functions, load_prompt, results
+from src.json_io import check_output, load_functions, load_prompt, results
 from src.llm import get_vocab_path, load_model
 from src.tokens import load_vocabulary
 
@@ -14,6 +14,7 @@ def main() -> int:
         print(f"{len(functions)} functions loaded")
         prompts = load_prompt(args.input)
         print(f"{len(prompts)} prompts loaded")
+        check_output(args.output)
         model = load_model(args.model)
         print(f"Model {args.model} loaded")
         vocab = load_vocabulary(get_vocab_path(model))
