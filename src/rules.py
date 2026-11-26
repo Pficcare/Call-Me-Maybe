@@ -10,7 +10,7 @@ def is_choice_prefix(text: str, choices: Sequence[str]) -> bool:
 
 
 def is_number_complete(text: str) -> bool:
-    pattern = r"-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?"
+    pattern = r"-?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?"
     return re.fullmatch(pattern, text) is not None
 
 
@@ -19,12 +19,16 @@ def is_number_prefix(text: str) -> bool:
 
 
 def is_integer_complete(text: str) -> bool:
-    pattern = r"-?(0|[1-9][0-9]*)"
+    pattern = r"-?[0-9]+"
     return re.fullmatch(pattern, text) is not None
 
 
 def is_integer_prefix(text: str) -> bool:
     return is_integer_complete(text) or is_integer_complete(text + "0")
+
+
+def remove_leading_zeros(text: str) -> str:
+    return re.sub(r"^(-?)0+(?=[0-9])", r"\1", text)
 
 
 def is_boolean_complete(text: str) -> bool:
