@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from llm_sdk import Small_LLM_Model
 
 
-def explore_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list[PromptRequest], functions: list[FunctionDefinition]) -> list[FunctionCall]:
+def process_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list[PromptRequest], functions: list[FunctionDefinition]) -> list[FunctionCall]:
 
     calls: list[FunctionCall] = []
 
@@ -46,13 +46,13 @@ def select_function(request: PromptRequest, functions: list[FunctionDefinition],
     for el in functions:
         names.append(el.name)
 
-    selcted_name = generate_choice(model, vocab, ids, names)
+    selected_name = generate_choice(model, vocab, ids, names)
     
     for function in functions:
-        if function.name == selcted_name:
+        if function.name == selected_name:
             return function
     
-    raise RuntimeError(f"Unknown function: {selcted_name}")
+    raise RuntimeError(f"Unknown function: {selected_name}")
 
 
 def extract_arguments(request: PromptRequest, function: FunctionDefinition, model: "Small_LLM_Model", vocab: dict[int, str]) -> str:
