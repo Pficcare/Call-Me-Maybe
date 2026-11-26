@@ -7,6 +7,7 @@ from src.llm import encode_text
 from src.schemas import ArgumentValue, FunctionCall, FunctionDefinition, PromptRequest
 from src.prompts import build_arguments_prompt, build_selection_prompt
 from src.decoder import generate_choice, generate_value
+from src.rules import remove_leading_zeros
 
 if TYPE_CHECKING:
     from llm_sdk import Small_LLM_Model
@@ -77,6 +78,8 @@ def extract_arguments(request: PromptRequest, function: FunctionDefinition, mode
         arguments += json.dumps(name) + ":" + quote
         ids = encode_text(model, prompt + arguments)
         value = generate_value(model, vocab, ids, spec.type)
+        if spec.type in ("number", "integer"):
+            value = remove_leading_zeros(value)
         arguments += value + quote + terminator
 
     return "{" + arguments
