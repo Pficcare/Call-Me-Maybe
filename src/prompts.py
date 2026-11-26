@@ -14,25 +14,36 @@ def format_function(functions: list[FunctionDefinition]) -> str:
     return "\n".join(lines)
 
 
+def build_chat_prompt(user: str, answer_start: str) -> str:
+    return (
+        f"<|im_start|>user\n{user}<|im_end|>\n"
+        "<|im_start|>assistant\n"
+        "<think>\n\n</think>\n\n"
+        f"{answer_start}"
+    )
+
+
 def build_selection_prompt(request: PromptRequest,functions: list[FunctionDefinition],) -> str:
     
     catalog = format_function(functions)
     
-    return (
+    user = (
         "Available functions:\n"
         f"{catalog}\n\n"
         f"Request: {request.prompt}\n"
-        'Function call: {"name": "'
+        "Answer with the function call in JSON."
     )
+    return build_chat_prompt(user, '{"name": "')
 
 
 def build_arguments_prompt(request: PromptRequest, function: FunctionDefinition) -> str:
 
     signature = format_function([function])
 
-    return (
+    user = (
         "Function:\n"
         f"{signature}\n\n"
         f"Request: {request.prompt}\n"
-        "Arguments: {"
+        "Answer with the arguments in JSON."
     )
+    return build_chat_prompt(user, "{")
