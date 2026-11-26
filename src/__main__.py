@@ -27,9 +27,9 @@ def main() -> int:
         return 1
     except KeyboardInterrupt:
         print("Interrupted by user", file=sys.stderr)
-        return 130 #Shell code erreur pour ce type d Interupt
+        return 130  # Shell code erreur pour ce type d Interupt
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main()) #retourn le bon code d erreur au shell
+    sys.exit(main())  # retourn le bon code d erreur au shell

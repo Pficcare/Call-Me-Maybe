@@ -4,7 +4,12 @@ import sys
 from typing import TYPE_CHECKING
 
 from src.llm import encode_text
-from src.schemas import ArgumentValue, FunctionCall, FunctionDefinition, PromptRequest
+from src.schemas import (
+    ArgumentValue,
+    FunctionCall,
+    FunctionDefinition,
+    PromptRequest,
+)
 from src.prompts import build_arguments_prompt, build_selection_prompt
 from src.decoder import generate_choice, generate_value
 from src.rules import remove_leading_zeros
@@ -13,12 +18,17 @@ if TYPE_CHECKING:
     from llm_sdk import Small_LLM_Model
 
 
-def process_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list[PromptRequest], functions: list[FunctionDefinition]) -> list[FunctionCall]:
+def process_prompts(
+    model: "Small_LLM_Model",
+    vocab: dict[int, str],
+    prompts: list[PromptRequest],
+    functions: list[FunctionDefinition],
+) -> list[FunctionCall]:
 
     calls: list[FunctionCall] = []
 
     for prompt in prompts:
-        print(f"\nPrompt: {prompt.prompt!r}") #!r ca donne ""
+        print(f"\nPrompt: {prompt.prompt!r}")  # !r ca donne ""
         try:
             function = select_function(prompt, functions, model, vocab)
             print(f"  -> {function.name}")
@@ -36,26 +46,36 @@ def process_prompts(model: "Small_LLM_Model",vocab: dict[int, str],prompts: list
     return calls
 
 
-def select_function(request: PromptRequest, functions: list[FunctionDefinition],model: "Small_LLM_Model", vocab: dict[int,str]) -> FunctionDefinition:
-    
+def select_function(
+    request: PromptRequest,
+    functions: list[FunctionDefinition],
+    model: "Small_LLM_Model",
+    vocab: dict[int, str],
+) -> FunctionDefinition:
+
     prompt = build_selection_prompt(request, functions)
-    
+
     ids = encode_text(model, prompt)
-    
-    names :list[str] = []
+
+    names: list[str] = []
     for el in functions:
         names.append(el.name)
 
     selected_name = generate_choice(model, vocab, ids, names)
-    
+
     for function in functions:
         if function.name == selected_name:
             return function
-    
+
     raise RuntimeError(f"Unknown function: {selected_name}")
 
 
-def extract_arguments(request: PromptRequest, function: FunctionDefinition, model: "Small_LLM_Model", vocab: dict[int, str]) -> str:
+def extract_arguments(
+    request: PromptRequest,
+    function: FunctionDefinition,
+    model: "Small_LLM_Model",
+    vocab: dict[int, str],
+) -> str:
 
     if not function.parameters:
         return "{}"
@@ -85,7 +105,9 @@ def extract_arguments(request: PromptRequest, function: FunctionDefinition, mode
     return "{" + arguments
 
 
-def build_call(request: PromptRequest, function: FunctionDefinition, arguments: str) -> FunctionCall:
+def build_call(
+    request: PromptRequest, function: FunctionDefinition, arguments: str
+) -> FunctionCall:
 
     parameters: dict[str, ArgumentValue] = json.loads(arguments)
 
@@ -99,4 +121,6 @@ def build_call(request: PromptRequest, function: FunctionDefinition, arguments: 
                 raise ValueError(f"Number too large for '{name}'")
             parameters[name] = number
 
-    return FunctionCall(prompt=request.prompt, name=function.name, parameters=parameters)
+    return FunctionCall(
+        prompt=request.prompt, name=function.name, parameters=parameters
+    )

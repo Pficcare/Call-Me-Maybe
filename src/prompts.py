@@ -23,10 +23,12 @@ def build_chat_prompt(user: str, answer_start: str) -> str:
     )
 
 
-def build_selection_prompt(request: PromptRequest,functions: list[FunctionDefinition],) -> str:
-    
+def build_selection_prompt(
+    request: PromptRequest, functions: list[FunctionDefinition]
+) -> str:
+
     catalog = format_function(functions)
-    
+
     user = (
         "Available functions:\n"
         f"{catalog}\n\n"
@@ -36,7 +38,9 @@ def build_selection_prompt(request: PromptRequest,functions: list[FunctionDefini
     return build_chat_prompt(user, '{"name": "')
 
 
-def build_arguments_prompt(request: PromptRequest, function: FunctionDefinition) -> str:
+def build_arguments_prompt(
+    request: PromptRequest, function: FunctionDefinition
+) -> str:
 
     signature = format_function([function])
 

@@ -4,21 +4,28 @@ import numpy as np
 import numpy.typing as npt
 
 from src.llm import get_next_logits
-from src.rules import is_choice_prefix, is_value_complete, is_value_end, is_value_prefix
+from src.rules import (
+    is_choice_prefix,
+    is_value_complete,
+    is_value_end,
+    is_value_prefix,
+)
 
 if TYPE_CHECKING:
     from llm_sdk import Small_LLM_Model
 
 
-def apply_mask(logits: npt.NDArray[np.float64], allowed_ids: list[int],) -> npt.NDArray[np.float64]:
-    
+def apply_mask(
+    logits: npt.NDArray[np.float64], allowed_ids: list[int]
+) -> npt.NDArray[np.float64]:
+
     masked = np.full_like(logits, -np.inf)
     masked[allowed_ids] = logits[allowed_ids]
     return masked
 
 
 def select_token(masked_logits: npt.NDArray[np.float64]) -> int:
-    
+
     if np.isneginf(masked_logits).all():
         raise RuntimeError("No allowed token")
     return int(np.argmax(masked_logits))
@@ -96,4 +103,6 @@ def generate_value(
             return current
         ids.append(token_id)
         current += vocab[token_id]
-    raise RuntimeError(f"Value not finished after {max_tokens} tokens: {current[:20]}...")
+    raise RuntimeError(
+        f"Value not finished after {max_tokens} tokens: {current[:20]}..."
+    )

@@ -40,7 +40,7 @@ def load_functions(path: Path) -> list[FunctionDefinition]:
 
 
 def load_prompt(path: Path) -> list[PromptRequest]:
-    
+
     data = read_json(path)
     adapter = TypeAdapter(list[PromptRequest])
     try:
@@ -63,7 +63,7 @@ def check_output(path: Path) -> None:
 
 
 def results(path: Path, calls: list[FunctionCall]) -> None:
-    
+
     data = [call.model_dump() for call in calls]
     try:
         text = json.dumps(data, indent=4, allow_nan=False)
